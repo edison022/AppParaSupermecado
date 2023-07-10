@@ -1,0 +1,75 @@
+@startuml
+
+class Producto {
+  - id: string
+  - nombre: string
+  - valor: number
+  + constructor(id: string, nombre: string, valor: number)
+}
+
+interface ClienteObserver {
+  + actualizar(listaProductos: Producto[]): void
+}
+
+class BaseDeDatosProductos {
+  - instancia: BaseDeDatosProductos
+  - productos: Producto[]
+  - observadores: ClienteObserver[]
+  + obtenerInstancia(): BaseDeDatosProductos
+  + agregarObservador(observador: ClienteObserver): void
+  + quitarObservador(observador: ClienteObserver): void
+  + agregarProducto(producto: Producto): void
+  + quitarProducto(id: string): void
+  + editarProducto(id: string, nuevoNombre: string, nuevoValor: number): void
+  + obtenerProductoPorId(id: string): Producto | undefined
+  + obtenerListaProductos(): Producto[]
+  - notificarObservadores(): void
+}
+
+abstract class Menu {
+  - baseDeDatos: BaseDeDatosProductos
+  + constructor(baseDeDatos: BaseDeDatosProductos)
+  + iniciar(): void
+}
+
+class MenuAdministrador {
+  + iniciar(): void
+  - agregarProducto(): void
+  - quitarProducto(): void
+  - editarProducto(): void
+}
+
+class MenuCliente {
+  - carrito: Producto[]
+  - clientesRegistrados: { nombreUsuario: string; contrasena: string }[]
+  + constructor(baseDeDatos: BaseDeDatosProductos, clientesRegistrados: { nombreUsuario: string; contrasena: string }[])
+  + iniciar(): void
+  - validarCliente(nombreUsuario: string, contrasena: string): boolean
+  - agregarProducto(): void
+  - quitarProducto(): void
+  - calcularTotal(): void
+  + actualizar(listaProductos: Producto[]): void
+}
+
+class Presentacion {
+  - menuAdministrador: MenuAdministrador
+  - menuCliente: MenuCliente
+  - clientesRegistrados: { nombreUsuario: string; contrasena: string }[]
+  + constructor()
+  + iniciar(): void
+  - registrarCliente(): void
+}
+
+class readlineSync {
+  <<typescript>>
+}
+
+Producto --|> ClienteObserver
+BaseDeDatosProductos "1" --> "0..*" ClienteObserver
+Menu <|-- MenuAdministrador
+Menu <|-- MenuCliente
+MenuCliente --|> ClienteObserver
+Presentacion --> MenuAdministrador
+Presentacion --> MenuCliente
+
+@enduml
